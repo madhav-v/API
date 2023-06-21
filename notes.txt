@@ -1,0 +1,247 @@
+MVC pattern
+
+
+Ecommerce APplication 
+    -> Login 
+    -> Register
+    -> Admin Panel 
+    -> Customer Portal 
+
+    -> Cart 
+    -> Favourite 
+    -> Category 
+    -> Product 
+    -> Search
+    -> Payment
+        -> QR payment  
+    -> Reviews 
+    -> Contact
+    
+    -> Sorting/Filtering
+    -> 
+
+
+    -> Auth and Authorization 
+        => login, 
+        => Register, 
+        => User Activation, 
+        => Forget Password, 
+        => reset Password,
+        => logout
+
+    -> User Dashboard 
+        -> Admin Dashboard
+            -> All control of the project
+                -> Product CRUD 
+                -> Brand CRUD 
+                -> Category CRUD 
+                -> Order Module
+                -> User Module
+                -> Transaction 
+
+                -> Reviews 
+                -> Feedback 
+                -> Offer 
+                -> Inventory 
+                -> Logistic 
+                -> Ads 
+                -> Blogs 
+        -> Seller Dashboard
+            -> Product entry 
+            -> Self order view 
+        -> Customer Dashboard
+            -> Product Purchase 
+
+    -> Website 
+
+// Banner Modules 
+create 
+list 
+update 
+delete 
+active
+=> http://localhost:3005/api/v1/banner -> get (list all banner)
+=> http://localhost:3005/api/v1/banner/create -> post (create a banner)
+=> http://localhost:3005/api/v1/banner/update -> put (update a banner)
+=> http://localhost:3005/api/v1/banner/delete -> delete (Delete a banner)
+=> http://localhost:3005/api/v1/banner/active -> get (Get active a banner)
+
+// Express Middleware 
+    => at least 3 param, 
+        (req, res, next) => next is a callback which trigers the next Middleware call
+a. Application level Middleware - .use(mount)
+b. Routing level Middleware 
+c. Error handling Middleware (garbage Collector)
+d. Third Party Middleware 
+3. Custom Middleware
+
+400 => Bad Request 
+    => Login APi 
+        => email -> text, password
+
+        res.status(400).json()
+
+401 => Unauthenticated/Unauthorized
+    => product/create 
+        => login required
+            -> no login info provided
+
+            res.status(401).json()
+
+403 => Forbidden 
+    => you do not have access right
+
+404 => Not found 
+    => 
+
+405 => Method not allowed
+
+422 => Unprocessable Entity/Content
+    => Login Api => email, password
+    => Payload 
+        -> username, password
+        res.status(422).json()
+
+SMTP Server
+    smtp => 25 
+    imap, pop3 => 
+
+Application Email 
+    app server
+    http(3005)  ======>   smtp(25 or custom) ======> network 
+    127.0.0.1
+
+
+CRUD  
+    => Create
+        ** Single row insert => db.collectionName.insertOne(object)
+        ** Multi- Row insert => db.collectionName.insertMany([objects])
+        -> After success, returns an acknowledgement 
+            _id key assign ObjectId -> Unique -> Behaves as a primary key
+            - {acknowledged: true, insertedId: ObjectId(<recently CreatedId>)}
+    => Read 
+        ** Single Row Read 
+            => db.collectionName.findOne(filter, projection);
+        ** Multi Row Read 
+            => db.collectionName.find(filter, projection)
+
+            $or, $and, $gt, $gte, $lt, $lte, $eq, $in, $nin, $ne
+
+            where filter is an object to query the value in db
+            {
+                column: value,
+                column1: value
+            }
+            // column = 'value' and column1 = 'value'
+
+            {
+                column: {$operator: value}
+            }
+            // users => age > 16
+            {
+                age: {$gt: 16}
+            }
+            // age > 16
+
+
+            {
+                $or: {
+                    key: value,
+                    key: value
+                }
+            }
+
+            projection: {column: 1 or 0}
+    => Update 
+        ** Single row Update 
+            db.collectionName.updateOne(filter, {$set: data})
+        ** Miultiple Row update
+            db.collectionName.updateMany(filter, {$set: data})
+    => Delete 
+        ** Single Row Delete 
+            db.collectionName.deleteOne(filter)
+        ** Delete Multi Row 
+            db.collectionName.deleteMany(filter)
+            
+    [
+        {
+            "name": "User One", 
+            "email": "userOne@broadwayinfosys.com", 
+            "password": "userone123", 
+            "role": "user", 
+            "address": "Kathmandu",
+            "status": "active" 
+        }, 
+        {
+            "name": "User Two", 
+            "email": "userTwo@broadwayinfosys.com", 
+            "password": "usertwo123", 
+            "role": "user", 
+            "address": "Kathmandu",
+            "status": "inactive" 
+        }
+    ]
+
+Create a collection named: products.
+a. Insert Atleast 10 products with, name, price, discount, brand, category 
+b. Fetch all the products with name, price and discount value 
+c. Fetch all the products with if disocunt > 0
+
+[
+    {
+        name: "Product One",
+        price: 1000, 
+        discount: 10,
+        brand: "apple",
+        category: "phone"
+    },
+    {
+        name: "Product Two",
+        price: 1000, 
+        discount: 0,
+        brand: "samsung",
+        category: "phone"
+    }
+]
+
+
+mongodb core driver 
+
+ODM / ORM 
+mongoose 
+sequelize 
+
+Brand
+-rating
+-Profile
+-category
+-Chat response time
+
+Category
+-Fashion
+-Automobiles
+-Health
+-Electronics
+
+Product
+-rating
+-price
+-discount
+
+Banners
+
+Order
+-orderId
+-PlacedOn
+-PaidOn
+-total
+
+Transaction
+-Taxes
+-Discounts
+-Select Paymnet Method
+-Sub-total
+-total
+
+NOt Updated
+NOt listed
