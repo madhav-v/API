@@ -2,6 +2,7 @@ const http = require("http");
 const express = require("express");
 const app = express();
 const routes = require("./src/routes");
+const cors = require("cors");
 require("./src/config/mongoose.config");
 
 app.use(express.json());
@@ -10,6 +11,8 @@ app.use(
     extended: false,
   })
 );
+
+app.use(cors());
 
 app.use("/api/v1", routes);
 

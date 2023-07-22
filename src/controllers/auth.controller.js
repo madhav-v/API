@@ -67,18 +67,19 @@ class AuthController {
   register = async (req, res, next) => {
     try {
       let registerData = req.body;
+      registerData.status = "inactive";
       if (req.file) {
         registerData.image = req.file.filename;
       }
       userSvc.validatedata(registerData);
       registerData.password = bcrypt.hashSync(registerData.password, 10);
-      registerData.token = helpers.generateRandomString();
+      registerData.activationToken = helpers.generateRandomString();
 
       let registerResponse = await userSvc.registerUser(registerData);
       if (registerResponse) {
         let mailMsg = `Dear ${registerData.name},<br/>Your account has been registered 
                     successfully. Please click the link below or copy paste the url to activate your account: 
-                    <a href="${process.env.FRONTEND_URL}activate/${registerData.token}">${process.env.FRONTEND_URL}activate/${registerData.token}</a>
+                    <a href="${process.env.FRONTEND_URL}activate/${registerData.activationToken}">${process.env.FRONTEND_URL}activate/${registerData.activationToken}</a>
                     <br/>
                     Regards,<br>
                     No-Reply, Admin
@@ -103,11 +104,108 @@ class AuthController {
     }
   };
 
-  activateUser = (req, res, next) => {};
+  activateUser = async (req, res, next) => {
+    try {
+      let token = req.params.token;
+      let userInfo = await userSvc.getUserByFilter({
+        activationToken: token,
+      });
+      console.log(userInfo);
 
-  forgetPassword = (req, res, next) => {};
+      if (!userInfo || userInfo.length <= 0) {
+        throw { status: 400, msg: "Token expired or already used" };
+      } else {
+        let update = await userSvc.updateUser(
+          {
+            activationToken: null,
+            status: "active",
+          },
+          userInfo[0]._id
+        );
+        res.json({
+          result: userInfo,
+          msg: "User activated successfully",
+          status: true,
+        });
+      }
+    } catch (exception) {
+      console.log(exception);
+      next(exception);
+    }
+  };
 
-  resetPassword = (req, res, next) => {};
+  forgetPassword = async (req, res, next) => {
+    try {
+      console.log("Received forgetPassword request");
+      const { email } = req.body;
+
+      if (!email) {
+        throw { status: 400, msg: "Email is required" };
+      }
+
+      const user = await userSvc.getUserByEmail(email);
+      if (!user) {
+        throw { status: 404, msg: "User not found" };
+      }
+
+      const resetToken = helpers.generateRandomString();
+
+      await userSvc.updateUser({ resetToken }, user._id);
+
+      const mailMsg = `Dear ${user.name},<br/>To reset your password, follow the link:  
+                    <a href="${process.env.FRONTEND_URL}set-password/${resetToken}">${process.env.FRONTEND_URL}set-password/${resetToken}</a>
+                    <br/>
+                    Regards,<br>
+                    No-Reply, Admin
+                    `;
+
+      await mailSvc.sendMail(user.email, "Reset Your Password", mailMsg);
+
+      res.json({
+        result: {},
+        msg: "Reset Password email sent successfully",
+        status: true,
+      });
+    } catch (exception) {
+      console.log(exception);
+      next(exception);
+    }
+  };
+
+  resetPassword = async (req, res, next) => {
+    try {
+      const { email, newPassword } = req.body;
+
+      if (!email || !newPassword) {
+        throw { status: 400, msg: "Email and new Password are required" };
+      }
+
+      if (newPassword.length < 8) {
+        throw {
+          status: 400,
+          msg: "Password should be at least 8 characters long",
+        };
+      }
+
+      const user = await userSvc.getUserByEmail(email);
+      if (!user) {
+        throw { status: 404, msg: "User not found" };
+      }
+
+      const hashedPassword = bcrypt.hashSync(newPassword, 10);
+
+      await userSvc.updateUser({ password: hashedPassword }, user._id);
+
+      res.json({
+        result: {},
+        msg: "Password has been reset successfully",
+        status: true,
+      });
+    } catch (exception) {
+      console.log(exception);
+      next(exception);
+    }
+  };
 
   getLoggedInUser = (req, res, next) => {
     try {
