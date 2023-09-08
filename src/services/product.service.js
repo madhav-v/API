@@ -6,10 +6,16 @@ class ProductService {
     try {
       let schema = Joi.object({
         name: Joi.string().min(3).required(),
-        slug: Joi.string().required(),
-        price: Joi.number().required(),
-        afterDiscount: Joi.number().required(),
-        image: Joi.string().required(),
+        categories: Joi.string(),
+        detail: Joi.string(),
+        price: Joi.number().min(1).required(),
+        discount: Joi.number().min(0).max(99),
+        brand: Joi.string(),
+        attributes: Joi.array(),
+        isFeatured: Joi.bool(),
+        images: Joi.array().items(Joi.string()),
+        sellerId: Joi.string(),
+        status: Joi.string().valid("active", "inactive").default("active"),
       });
       let response = schema.validate(data);
       if (response.error) {
@@ -28,6 +34,9 @@ class ProductService {
       let skip = (currentPage - 1) * perPage;
 
       let data = await ProductModel.find()
+        .populate("categories")
+        .populate("brand")
+        .populate("sellerId")
         .sort({ _id: -1 })
         .skip(skip)
         .limit(perPage);
@@ -67,7 +76,10 @@ class ProductService {
 
   getProductById = async (id) => {
     try {
-      let product = await ProductModel.findById(id);
+      let product = await ProductModel.findById(id)
+        .populate("categories")
+        .populate("brand")
+        .populate("sellerId");
       if (product) {
         return product;
       } else {
@@ -99,6 +111,9 @@ class ProductService {
     try {
       let skip = (paging.currentPage - 1) * paging.perPage;
       let response = await ProductModel.find(filter)
+        .populate("categories")
+        .populate("brand")
+        .populate("sellerId")
         .sort({ _id: -1 })
         .skip(skip)
         .limit(paging.perPage);

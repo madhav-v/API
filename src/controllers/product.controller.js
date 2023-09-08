@@ -31,12 +31,34 @@ class ProductController {
   storeProduct = async (req, res, next) => {
     try {
       let data = req.body;
-      if (req.file) {
-        data.image = req.file.filename;
+      if (req.files) {
+        data.images = req.files.map((item) => {
+          return item.filename;
+        });
+      }
+
+      if (typeof data.attributes === "string") {
+        data.attributes = JSON.parse(data.attributes);
       }
 
       let validated = await this._svc.productValidate(data);
       validated.slug = slugify(validated.name, { lower: true });
+      if (validated.categories === "null") {
+        validated.categories = null;
+      } else {
+        validated.categories = validated.categories.split(",");
+      }
+
+      if (validated.brand === "null") {
+        validated.brand = null;
+      }
+
+      if (validated.sellerId === "null") {
+        validated.sellerId = null;
+      }
+
+      validated.afterDiscount =
+        validated.price - (validated.price * validated.discount) / 100;
       let response = await this._svc.createProduct(validated);
       res.json({
         result: response,
@@ -53,20 +75,38 @@ class ProductController {
     try {
       let data = req.body;
       let product = await this._svc.getProductById(req.params.id);
-      if (req.file) {
-        data.image = req.file.filename;
+      let images = [];
+      if (req.files) {
+        images = req.files.map((item) => {
+          return item.filename;
+        });
       }
-      else {
-        if (!product.images) {
-          throw new Error("Product image is missing.");
-        }
-        data.images = product.images;
+
+      data.images = [...product.images, ...images];
+
+      if (typeof data.attributes === "string") {
+        data.attributes = JSON.parse(data.attributes);
       }
-      //  else {
-      //   data.image = product.image;
-      // }
 
       let validated = await this._svc.productValidate(data);
+
+      if (validated.categories === "null") {
+        validated.categories = null;
+      } else {
+        validated.categories = validated.categories.split(",");
+      }
+
+      if (validated.brand === "null") {
+        validated.brand = null;
+      }
+
+      if (validated.sellerId === "null") {
+        validated.sellerId = null;
+      }
+
+      validated.afterDiscount =
+        validated.price - (validated.price * validated.discount) / 100;
+
       let response = await this._svc.updateProduct(validated, req.params.id);
       res.json({
         result: response,
@@ -111,6 +151,20 @@ class ProductController {
         msg: "Product Data",
         status: true,
         meta: paging,
+      });
+    } catch (except) {
+      next(except);
+    }
+  };
+  getProductById = async (req, res, next) => {
+    try {
+      let product = await this._svc.getProductById(req.params.id);
+
+      res.json({
+        result: product,
+        msg: "Product fetched successfully",
+        status: true,
+        meta: null,
       });
     } catch (except) {
       next(except);

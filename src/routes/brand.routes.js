@@ -30,6 +30,13 @@ router
     uploader.single("image"),
     brandCtrl.updateBrand
   )
+  .get(
+    authCheck,
+    checkPermission("admin"),
+    uploadPath,
+    uploader.single("image"),
+    brandCtrl.getBrandById
+  )
   .delete(authCheck, checkPermission("admin"), brandCtrl.deleteBrand);
 
 router.get("/list/home", brandCtrl.getBrandForHomePage);

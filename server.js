@@ -14,6 +14,8 @@ app.use(
 
 app.use(cors());
 
+app.use("/assets/", express.static(process.cwd() + "/public/"));
+
 app.use("/api/v1", routes);
 
 const server = http.createServer(app);

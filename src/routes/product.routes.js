@@ -17,7 +17,7 @@ router
     authCheck,
     checkPermission("admin"),
     uploadPath,
-    uploader.single("image"),
+    uploader.array("images"),
     productCtrl.storeProduct
   );
 
@@ -30,6 +30,7 @@ router
     uploader.single("image"),
     productCtrl.updateProduct
   )
+  .get(authCheck, checkPermission("admin"), productCtrl.getProductById)
   .delete(authCheck, checkPermission("admin"), productCtrl.deleteProduct);
 
 router.get("/list/home", productCtrl.getProductForHomePage);

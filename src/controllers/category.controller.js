@@ -35,6 +35,13 @@ class CategoryController {
         data.image = req.file.filename;
       }
 
+      if (data.parent === "NULL" || !data.parent) {
+        data.parent = null;
+      }
+      if (data.brands === "NULL" || !data.brands) {
+        data.brands = null;
+      }
+
       let validated = await this._svc.categoryValidate(data);
       validated.slug = slugify(validated.name, { lower: true });
       let response = await this._svc.createCategory(validated);
@@ -104,6 +111,26 @@ class CategoryController {
         msg: "Category Data",
         status: true,
         meta: paging,
+      });
+    } catch (except) {
+      next(except);
+    }
+  };
+  getCategoryById = async (req, res, next) => {
+    try {
+      let filter = {
+        _id: req.params.id,
+      };
+      let paging = {
+        currentPage: 1, // Set a default currentPage if needed
+        perPage: 10, // Set a default perPage if needed
+      };
+      let data = await this._svc.getCategoryByFilter(filter, paging);
+      res.json({
+        result: data[0],
+        msg: "Category Data",
+        status: true,
+        meta: null,
       });
     } catch (except) {
       next(except);

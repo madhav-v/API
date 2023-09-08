@@ -15,7 +15,6 @@ class BannerController {
         currentPage: req.query.page ? Number(req.query.page) : 1,
       };
 
-
       let data = await this._svc.getAllBanners(paging);
       res.json({
         result: data,
@@ -102,6 +101,20 @@ class BannerController {
       });
     } catch (except) {
       next(except);
+    }
+  };
+  getBannerById = async (req, res, next) => {
+    try {
+      let id = req.params.id;
+      let data = await this._svc.getBannerById(id);
+      res.json({
+        result: data,
+        msg: "Banner Data",
+        status: true,
+        meta: null,
+      });
+    } catch (exception) {
+      next(exception);
     }
   };
 }

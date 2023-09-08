@@ -61,6 +61,7 @@ class BrandController {
 
       let validated = await this._svc.brandValidate(data);
       let response = await this._svc.updateBrand(validated, req.params.id);
+      console.log(response);
       res.json({
         result: response,
         msg: "Brand Updated successfully",
@@ -104,6 +105,20 @@ class BrandController {
         msg: "Brand Data",
         status: true,
         meta: paging,
+      });
+    } catch (except) {
+      next(except);
+    }
+  };
+  getBrandById = async (req, res, next) => {
+    try {
+      let brand = await this._svc.getBrandById(req.params.id);
+
+      res.json({
+        result: brand,
+        msg: "Brand fetched successfully",
+        status: true,
+        meta: null,
       });
     } catch (except) {
       next(except);

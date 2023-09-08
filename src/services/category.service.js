@@ -5,8 +5,17 @@ class CategoryService {
   categoryValidate = async (data) => {
     try {
       let schema = Joi.object({
-        name: Joi.string().min(3).required(),
-        slug: Joi.string().required(),
+        name: Joi.string().required(),
+        parent: Joi.string().allow(null),
+        image: Joi.string(),
+        slug: Joi.string().allow(null),
+        brands: Joi.array().items(Joi.string()),
+        attributes: Joi.array().items(
+          Joi.object({
+            key: Joi.string().required(),
+            value: Joi.array().items(Joi.string()),
+          })
+        ),
         status: Joi.string().valid("active", "inactive").default("inactive"),
       });
       let response = schema.validate(data);
@@ -20,12 +29,13 @@ class CategoryService {
       throw exception;
     }
   };
-
   getAllCategorys = async ({ perPage = 10, currentPage = 1 }) => {
     try {
       let skip = (currentPage - 1) * perPage;
 
       let data = await CategoryModel.find()
+        .populate("brands")
+        .populate("parent")
         .sort({ _id: -1 })
         .skip(skip)
         .limit(perPage);
@@ -65,7 +75,9 @@ class CategoryService {
 
   getCategoryById = async (id) => {
     try {
-      let category = await CategoryModel.findById(id);
+      let category = await CategoryModel.findById(id)
+        .populate("brands")
+        .populate("parent");
       if (category) {
         return category;
       } else {
@@ -97,11 +109,14 @@ class CategoryService {
     try {
       let skip = (paging.currentPage - 1) * paging.perPage;
       let response = await CategoryModel.find(filter)
+        .populate("brands")
+        .populate("parent")
         .sort({ _id: -1 })
         .skip(skip)
         .limit(paging.perPage);
       return response;
     } catch (exception) {
+      console.log(exception);
       throw exception;
     }
   };

@@ -30,6 +30,7 @@ router
     uploader.single("image"),
     categoryCtrl.updateCategory
   )
+  .get(authCheck, checkPermission("admin"), categoryCtrl.getCategoryById)
   .delete(authCheck, checkPermission("admin"), categoryCtrl.deleteCategory);
 
 router.get("/list/home", categoryCtrl.getCategoryForHomePage);

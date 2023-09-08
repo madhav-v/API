@@ -31,6 +31,14 @@ router
     uploader.single("image"),
     bannerCtrl.updateBanner
   )
+  .get(
+    authCheck,
+    checkPermission("admin"),
+    uploadPath,
+    uploader.single("image"),
+    bannerCtrl.getBannerById
+  )
+
   .delete(authCheck, checkPermission("admin"), bannerCtrl.deleteBanner);
 
 router.get("/list/home", bannerCtrl.getBannerForHomePage);
