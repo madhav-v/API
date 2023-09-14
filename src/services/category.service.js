@@ -105,15 +105,13 @@ class CategoryService {
     }
   };
 
-  getCategoryByFilter = async (filter, paging) => {
+  getCategoryByFilter = async (filter) => {
     try {
-      let skip = (paging.currentPage - 1) * paging.perPage;
       let response = await CategoryModel.find(filter)
         .populate("brands")
         .populate("parent")
         .sort({ _id: -1 })
-        .skip(skip)
-        .limit(paging.perPage);
+        .limit(10);
       return response;
     } catch (exception) {
       console.log(exception);

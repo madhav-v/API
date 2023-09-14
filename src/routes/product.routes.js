@@ -9,7 +9,7 @@ const uploadPath = (req, res, next) => {
   req.uploadPath = "./public/products/";
   next();
 };
-
+router.get("/:slug/detail", productCtrl.getProductBySlug);
 router
   .route("/")
   .get(authCheck, checkPermission("admin"), productCtrl.listAllProducts)
@@ -20,7 +20,7 @@ router
     uploader.array("images"),
     productCtrl.storeProduct
   );
-
+router.get("/search", productCtrl.searchAllProducts);
 router
   .route("/:id")
   .put(

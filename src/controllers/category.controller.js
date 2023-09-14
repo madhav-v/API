@@ -1,11 +1,13 @@
 const CategoryService = require("../services/category.service");
 const slugify = require("slugify");
+const ProductService = require("../services/product.service");
 
 class CategoryController {
   _svc;
 
   constructor() {
     this._svc = new CategoryService();
+    this._prodSvc = new ProductService();
   }
 
   listAllCategorys = async (req, res, next) => {
@@ -131,6 +133,26 @@ class CategoryController {
         msg: "Category Data",
         status: true,
         meta: null,
+      });
+    } catch (except) {
+      next(except);
+    }
+  };
+  getDetailOfCategory = async (req, res, next) => {
+    try {
+      let slug = req.params.slug;
+      let category = await this._svc.getCategoryByFilter({ slug: slug });
+      let products = await this._prodSvc.getProductByFilter(
+        { categories: { $in: [category[0]._id] } },
+        { perPage: 100, currentPage: 1 }
+      );
+      res.json({
+        data: {
+          categoryDetail: category[0],
+          productList: products,
+        },
+        status: true,
+        msg: "Product List",
       });
     } catch (except) {
       next(except);

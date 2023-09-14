@@ -93,13 +93,11 @@ class BrandService {
     }
   };
 
-  getBrandByFilter = async (filter, paging) => {
+  getBrandByFilter = async (filter) => {
     try {
-      let skip = (paging.currentPage - 1) * paging.perPage;
       let response = await BrandModel.find(filter)
         .sort({ _id: -1 })
-        .skip(skip)
-        .limit(paging.perPage);
+        .limit(10);
       return response;
     } catch (exception) {
       throw exception;

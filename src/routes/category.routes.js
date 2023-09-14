@@ -10,6 +10,8 @@ const uploadPath = (req, res, next) => {
   next();
 };
 
+router.get("/:slug/detail", categoryCtrl.getDetailOfCategory);
+
 router
   .route("/")
   .get(authCheck, checkPermission("admin"), categoryCtrl.listAllCategorys)

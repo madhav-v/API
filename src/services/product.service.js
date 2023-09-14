@@ -111,6 +111,7 @@ class ProductService {
     try {
       let skip = (paging.currentPage - 1) * paging.perPage;
       let response = await ProductModel.find(filter)
+
         .populate("categories")
         .populate("brand")
         .populate("sellerId")

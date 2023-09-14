@@ -10,9 +10,13 @@ const categoryCtrl = new CategoryController();
 const ProductController = require("./product.controller");
 const productCtrl = new ProductController();
 
+const CartController = require("./cart.controller");
+const cartCtrl = new CartController();
+
 module.exports = {
   bannerCtrl,
   brandCtrl,
   categoryCtrl,
   productCtrl,
+  cartCtrl,
 };

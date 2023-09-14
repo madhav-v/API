@@ -170,5 +170,52 @@ class ProductController {
       next(except);
     }
   };
+  getProductBySlug = async (req, res, next) => {
+    try {
+      let product = await this._svc.getProductByFilter(
+        {
+          slug: req.params.slug,
+        },
+        {
+          perPage: 1,
+          currentPage: 1,
+        }
+      );
+
+      res.json({
+        result: product[0],
+        msg: "Product fetched successfully",
+        status: true,
+        meta: null,
+      });
+    } catch (except) {
+      next(except);
+    }
+  };
+  searchAllProducts = async (req, res, next) => {
+    try {
+      let query = req.query.search;
+      let listAll = await this._svc.getProductByFilter(
+        {
+          $or: [
+            { name: { $regex: query, $options: "i" } },
+            { detail: { $regex: query, $options: "i" } },
+          ],
+        },
+        {
+          perPage: 100,
+          currentPage: 1,
+        }
+      );
+
+      res.json({
+        result: listAll,
+        status: true,
+        msg: "search results",
+      });
+    } catch (exception) {
+      next(exception);
+    }
+  };
 }
 module.exports = ProductController;

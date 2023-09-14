@@ -9,6 +9,7 @@ const uploadPath = (req, res, next) => {
   req.uploadPath = "./public/brand/";
   next();
 };
+router.get("/:slug/detail", brandCtrl.getDetailOfBrand);
 
 router
   .route("/")
